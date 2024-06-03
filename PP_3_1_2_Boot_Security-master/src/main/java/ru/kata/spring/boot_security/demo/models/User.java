@@ -54,12 +54,11 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String firstName, String lastName, int age, String password, String email) {
+    public User(Long id, String firstName, String lastName, int age, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
-        this.password = password;
         this.email = email;
     }
 
@@ -140,7 +139,6 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", age=" + age +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", roles=" + roles +
                 '}';
     }
