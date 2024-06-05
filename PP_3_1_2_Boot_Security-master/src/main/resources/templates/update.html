@@ -118,7 +118,8 @@
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="text" th:field="*{password}" id="password" placeholder="Password" class="form-control">
+            <input type="text" th:field="*{password}" id="password"/>
+            <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
         </div>
         <label>Roles:</label>
         <div th:each="role : ${allRoles}">

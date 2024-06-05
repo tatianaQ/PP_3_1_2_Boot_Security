@@ -44,24 +44,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void update(long id, User user) {
-        // Получение существующего пользователя по ID
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        User updateUser = userRepository.findById(id).orElse(null);
 
-        existingUser.setEmail(user.getEmail());
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setAge(user.getAge());
-        existingUser.setRoles(user.getRoles());
+        if (updateUser != null) {
+            updateUser.setEmail(user.getEmail());
+            updateUser.setFirstName(user.getFirstName());
+            updateUser.setLastName(user.getLastName());
+            updateUser.setAge(user.getAge());
+            updateUser.setRoles(user.getRoles());
 
-        // Если пароль был изменен, кодируем его и обновляем
-        String newPassword = user.getPassword();
-        if (newPassword != null && !newPassword.equals(existingUser.getPassword())) {
-            existingUser.setPassword(passwordEncoder.encode(newPassword));
+            if (!updateUser.getPassword().equals(user.getPassword())) {
+                updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
         }
-
-        // Сохранение обновленных данных пользователя
-        userRepository.save(existingUser);
     }
 
     @Override

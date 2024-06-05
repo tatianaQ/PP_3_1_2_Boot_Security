@@ -45,7 +45,7 @@ public class AdminController {
         List<Role> allRoles = userService.getAllRoles();
         model.addAttribute("user", user);
         model.addAttribute("allRoles", allRoles);
-        return "admin";
+        return "update";
     }
 
     @PatchMapping("/admin/update")
