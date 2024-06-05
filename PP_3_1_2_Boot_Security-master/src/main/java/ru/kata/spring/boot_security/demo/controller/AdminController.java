@@ -1,15 +1,17 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.kata.spring.boot_security.demo.models.Details;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
-import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
+import ru.kata.spring.boot_security.demo.service.UserService;
+
 
 import javax.validation.Valid;
 import java.util.List;
@@ -17,24 +19,25 @@ import java.util.List;
 @Controller
 public class AdminController {
 
-    private final UserServiceImpl userService;
-    private final RoleRepository roleRepository;
+    private final UserService userService;
 
     @Autowired
-    public AdminController(UserServiceImpl userService, RoleRepository roleRepository) {
+    public AdminController(UserService userService) {
         this.userService = userService;
-        this.roleRepository = roleRepository;
     }
 
     @GetMapping("/admin")
     public String getAll(Model model) {
         List<User> users = userService.getAll();
         model.addAttribute("allUsers", users);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Details user = (Details) authentication.getPrincipal();
+
+        model.addAttribute("user", user);
+
         return "admin";
     }
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/admin/update")
     public String updateNewForm(Model model, @RequestParam("id") long id) {
@@ -42,7 +45,7 @@ public class AdminController {
         List<Role> allRoles = userService.getAllRoles();
         model.addAttribute("user", user);
         model.addAttribute("allRoles", allRoles);
-        return "update";
+        return "admin";
     }
 
     @PatchMapping("/admin/update")
@@ -57,7 +60,7 @@ public class AdminController {
     @GetMapping("/admin/new")
     public String addUser(Model model) {
         User newUser = new User();
-        List<Role> roles = roleRepository.findAll();
+        List<Role> roles = userService.getAllRoles();
         model.addAttribute("new_user", newUser);
         model.addAttribute("allRoles", roles);
         return "addUser";
@@ -68,11 +71,6 @@ public class AdminController {
         if (bindingResult.hasErrors()) {
             return "addUser";
         }
-
-        // Encode the password before saving
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-
         userService.create(user);
         return "redirect:/admin";
     }
